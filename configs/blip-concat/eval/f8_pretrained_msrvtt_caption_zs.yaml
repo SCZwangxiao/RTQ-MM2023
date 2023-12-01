@@ -1,0 +1,61 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: blip_video_post_caption
+  model_type: msrvtt
+  load_finetuned: False
+
+  num_frames: 8
+  image_size: 224
+  adapter_configs:
+    arch: blip_post_concat_adapter
+
+datasets:
+  msrvtt_caption: # name of the dataset builder
+    vis_processor:
+        eval:
+          name: "blip_post_video_eval"
+          n_frms: 8
+          image_size: 224
+    text_processor:
+        eval:
+          name: "blip_caption"
+    build_info:
+      # Be careful not to append minus sign (-) before split to avoid itemizing
+      annotations:
+        train:
+          storage: data/MultimodalDataset/msrvtt/txt_db/msrvtt_caption/train.jsonl
+        val:
+          storage: data/MultimodalDataset/msrvtt/txt_db/msrvtt_caption/test.jsonl
+        test:
+          storage: data/MultimodalDataset/msrvtt/txt_db/msrvtt_caption/test.jsonl
+      videos:
+        storage: data/MultimodalDataset/msrvtt/vis_db/msrvtt
+
+run:
+  task: captioning
+  # optimization-specific
+  batch_size_train: 32
+  batch_size_eval: 32
+  num_workers: 4
+
+  # decoding options
+  max_len: 20
+  min_len: 5
+  num_beams: 3
+
+  seed: 42
+  output_dir: "output/blip_concat_8f_pretrained/msrvtt_caption_zeroshot"
+
+  evaluate: True
+  test_splits: ["test"]
+
+  # distribution-specific
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+  use_dist_eval_sampler: False

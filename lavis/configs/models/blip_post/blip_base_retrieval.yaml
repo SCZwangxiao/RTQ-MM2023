@@ -1,0 +1,40 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: blip_video_post_retrieval
+  backbone_arch: vit
+
+  load_finetuned: False
+  pretrained: "modelzoo/BLIP/model_base_capfilt_large.pth"
+
+  # vit encoder
+  vit_type: "base"
+  vit_grad_ckpt: True
+  vit_ckpt_layer: 4
+
+  image_size: 384
+
+  # bert config
+  med_config_path: "configs/models/med_config.json"
+
+  queue_size: 57600
+  embed_dim: 256
+
+preprocess:
+  vis_processor:
+      train:
+        name: "blip_post_video_train"
+        n_frms: 8
+        image_size: 384
+      eval:
+        name: "blip_post_video_eval"
+        n_frms: 8
+        image_size: 384
+  text_processor:
+      train:
+        name: "blip_caption"
+      eval:
+        name: "blip_caption"

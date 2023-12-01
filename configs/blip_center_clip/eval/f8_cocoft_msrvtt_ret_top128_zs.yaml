@@ -1,0 +1,75 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: blip_video_post_retrieval
+  backbone_arch: 'center_clip'
+  model_type: msrvtt
+  load_finetuned: False
+
+  image_size: 224
+
+  cluster_cfg:
+    num_frames: 12
+    cluster_algo: 'kmediods++'
+    cluster_threshold: 1e-6
+    cluster_distance: 'euclidean'
+    minkowski_norm_p: 2.0
+    cluster_iter_limit: 100
+    cluster_inter: 1
+    cluster_embedding: 0
+    cluster_frame_embedding: 0
+    cluster_num_blocks: '196 196 196 196 196 196 196 196 196 196 196 196'
+    # target_frames_blocks: '12 12 12 12 12 12 6 6 6 6 6 6'
+    target_frames_blocks: '12 12 12 12 12 12 4 4 4 4 4 4'
+    deep_cluster: 0
+    spectral_knn_k: 1
+    spectral_sigma: 2.0
+    spectral_graph: 'HeatKernel'
+
+datasets:
+  msrvtt_retrieval: # name of the dataset builder
+    vis_processor:
+        eval:
+          name: "blip_post_video_eval"
+          n_frms: 12
+          image_size: 224
+    text_processor:
+        eval:
+          name: "blip_caption"
+    build_info:
+      # Be careful not to append minus sign (-) before split to avoid itemizing
+      annotations:
+        train:
+          storage: data/MultimodalDataset/msrvtt/txt_db/msrvtt_retrieval/train_1kA.jsonl
+        val:
+          storage: data/MultimodalDataset/msrvtt/txt_db/msrvtt_retrieval/test.jsonl
+        test:
+          storage: data/MultimodalDataset/msrvtt/txt_db/msrvtt_retrieval/test.jsonl
+      videos:
+        storage: data/MultimodalDataset/msrvtt/vis_db/msrvtt
+
+run:
+  task: retrieval
+  # optimization-specific
+  batch_size_train: 4
+  batch_size_eval: 4
+  num_workers: 4
+
+  # k_test: 128
+  k_test: 10 # FIXME
+
+  seed: 42
+  output_dir: "output/blip_centerclip_8f_top128/msrvtt_retrieval_zeroshot"
+
+  evaluate: True
+  test_splits: ["test"]
+
+  # distribution-specific
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+  use_dist_eval_sampler: False

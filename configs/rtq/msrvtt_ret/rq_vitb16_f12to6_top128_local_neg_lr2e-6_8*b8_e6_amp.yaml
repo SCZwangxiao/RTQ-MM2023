@@ -1,0 +1,89 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: blip_video_post_retrieval
+  model_type: default
+  backbone_arch: rtq
+  load_finetuned: False
+
+  image_size: 224
+  num_frames: 12
+
+  refinement_cfg:
+    cluster_algo: 'kmediods++'
+    cluster_threshold: 1e-6
+    cluster_distance: 'euclidean'
+    minkowski_norm_p: 2.0
+    cluster_iter_limit: 100
+    cluster_inter: 1
+    pretrained_clip_name: 'ViT-B/16'
+    cluster_embedding: 0
+    cluster_frame_embedding: 0
+    cluster_num_blocks: [196, 196, 196, 196, 196, 196, 196, 196, 196, 196, 196, 196]
+    target_frames_blocks: [12, 12, 12, 12, 12, 12, 12, 6, 6, 6, 6, 6]
+    deep_cluster: 0
+    spectral_knn_k: 1
+    spectral_sigma: 2.0
+    spectral_graph: 'HeatKernel'
+
+  alpha: 0.4
+  queue_size: 14400
+  negative_all_rank: False
+
+datasets:
+  msrvtt_retrieval: # name of the dataset builder
+    vis_processor:
+        train:
+          name: "blip_post_video_train"
+          n_frms: 12
+          image_size: 224
+        eval:
+          name: "blip_post_video_eval"
+          n_frms: 12
+          image_size: 224
+    text_processor:
+        train:
+          name: "blip_caption"
+        eval:
+          name: "blip_caption"
+
+run:
+  task: retrieval
+  evaluate: False
+
+  # optimizer
+  lr_sched: "linear_warmup_cosine_lr"
+  warmup_lr: 2e-7
+  warmup_steps: 500
+  init_lr: 2e-6
+  min_lr: 0
+  weight_decay: 0.04
+  max_epoch: 6
+
+  # dataloading
+  num_workers: 8
+  batch_size_train: 8 # local batch
+  batch_size_eval: 32
+
+  train_splits: ["train"]
+  valid_splits: ["val"]
+  test_splits: ["test"]
+
+  # model specific
+  k_test: 128
+
+  # distribution training
+  amp: True
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: True
+  use_dist_eval_sampler: False
+
+  # misc
+  seed: 42
+  log_freq: 10
+  resume_ckpt_path: null
