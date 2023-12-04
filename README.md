@@ -1,4 +1,5 @@
-# RTQ: Rethinking Video-language Understanding Based on Image-text models
+<h1 align="center"> <a href=https://arxiv.org/abs/2312.00347>RTQ: Rethinking Video-language Understanding <br/> Based on Image-text models</a></h2>
+
 
 
 ## :sparkles: Highlights
