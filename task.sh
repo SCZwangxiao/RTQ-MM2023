@@ -18,7 +18,7 @@ bash run_scripts/dist_train.sh configs/rtq/msrvtt_cap/rtq_vitb16_f12to6_lr2e-6_8
 bash run_scripts/dist_train.sh configs/rtq/msrvtt_qa/rtq_vitb16_f12to6_lr2e-5_8*b16_e6_amp.yaml $numGPU
 
 # NeXt-QA
-bash run_scripts/dist_train.sh configs/rtq/nextqa/rtq_vitb16_f16to4_lr1e-5_8*b16_e6_amp.yaml $numGPU
+bash run_scripts/dist_train.sh configs/rtq/nextqa/rtq_vitb16_f16to4_lr1e-5_8*b8_e6_amp.yaml $numGPU
 
 
 ################################## some useful command templates ##################################
