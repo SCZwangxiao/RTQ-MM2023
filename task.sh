@@ -32,4 +32,4 @@ bash run_scripts/dist_train.sh configs/rtq/nextqa/rtq_vitb16_f16to4_lr1e-5_8*b16
 bash run_scripts/dist_train.sh <path_to_your_config> $numGPU --options run.resume_ckpt_path=<path_to_latest_checkpoint>
 
 # Evaluation
-bash run_scripts/dist_test.sh <path_to_your_config> $numGPU --options model.load_finetuned=<path_to_the_checkpoint>
+bash run_scripts/dist_test.sh <path_to_your_config> $numGPU --options model.load_finetuned=True model.finetuned=<path_to_the_checkpoint>
