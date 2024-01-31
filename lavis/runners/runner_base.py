@@ -595,10 +595,11 @@ class RunnerBase:
             k: v.requires_grad for (k, v) in model_no_ddp.named_parameters()
         }
         state_dict = model_no_ddp.state_dict()
-        for k in list(state_dict.keys()):
-            if k in param_grad_dic.keys() and not param_grad_dic[k]:
-                # delete parameters that do not require gradient
-                del state_dict[k]
+        # TODO: delete parameters only if they are not from momentum models
+        # for k in list(state_dict.keys()):
+        #     if k in param_grad_dic.keys() and not param_grad_dic[k]:
+        #         # delete parameters that do not require gradient
+        #         del state_dict[k]
         save_obj = {
             "model": state_dict,
             "optimizer": self.optimizer.state_dict(),
